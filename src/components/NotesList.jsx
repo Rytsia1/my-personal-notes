@@ -24,7 +24,7 @@ function groupNotesByMonthYear(notes) {
   }));
 }
 
-function NotesList({ notes, onDelete, onArchive, searchKeyword, dataTestId = 'notes-list' }) {
+function NotesList({ notes, onEdit, onDelete, onArchive, searchKeyword, emptyMessage, dataTestId = 'notes-list' }) {
   // TODO [Basic] validasi notes agar tidak kosong.
   const hasNotes = Boolean(notes && notes.length > 0);
 
@@ -35,8 +35,9 @@ function NotesList({ notes, onDelete, onArchive, searchKeyword, dataTestId = 'no
         <p
           className="notes-list__empty-message"
           data-testid={`${dataTestId}-empty`}
+          style={{ textAlign: 'center', color: '#666', padding: '24px 0', fontStyle: 'italic' }}
         >
-          Tidak ada catatan
+          {emptyMessage || "Tidak ada catatan"}
         </p>
       </div>
     );
@@ -69,6 +70,7 @@ function NotesList({ notes, onDelete, onArchive, searchKeyword, dataTestId = 'no
               <NoteItem
                 key={note.id}
                 note={note}
+                onEdit={onEdit}
                 onDelete={onDelete}
                 onArchive={onArchive}
                 searchKeyword={searchKeyword}

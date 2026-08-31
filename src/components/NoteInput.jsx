@@ -6,21 +6,19 @@ class NoteInput extends React.Component {
     super(props);
 
     this.state = {
-      // TODO [Basic] kelola nilai title sebagai controlled input.
       title: '',
-      // TODO [Basic] kelola nilai body sebagai controlled textarea.
       body: '',
+      tagsString: '',
       errorMessage: '',
     };
 
     this.onTitleChangeEventHandler = this.onTitleChangeEventHandler.bind(this);
     this.onBodyChangeEventHandler = this.onBodyChangeEventHandler.bind(this);
+    this.onTagsChangeEventHandler = this.onTagsChangeEventHandler.bind(this);
     this.onSubmitEventHandler = this.onSubmitEventHandler.bind(this);
   }
 
   onTitleChangeEventHandler(event) {
-    // TODO [Basic] update state dengan nilai event.target.value.
-    // TODO [Skilled] batasi judul maksimal 50 karakter dan tampilkan peringatan saat sisa karakter < 10.
     const title = event.target.value.slice(0, 50);
     this.setState(() => ({
       title,
@@ -29,37 +27,46 @@ class NoteInput extends React.Component {
   }
 
   onBodyChangeEventHandler(event) {
-    // TODO [Basic] update state body agar textarea menjadi controlled component.
     this.setState(() => ({
       body: event.target.value,
       errorMessage: '',
     }));
   }
 
+  onTagsChangeEventHandler(event) {
+    this.setState(() => ({
+      tagsString: event.target.value,
+    }));
+  }
+
   onSubmitEventHandler(event) {
     event.preventDefault();
 
-    // TODO [Basic] panggil props.addNote dengan data title & body dari state, lalu reset form.
-    // TODO [Advanced] tolak submit ketika body kurang dari 10 karakter dan tampilkan pesan error.
     if (this.state.body.trim().length < 10) {
       this.setState({ errorMessage: 'Isi catatan minimal 10 karakter.' });
       return;
     }
 
+    const tags = this.state.tagsString
+      .split(',')
+      .map(tag => tag.trim())
+      .filter(tag => tag.length > 0);
+
     this.props.addNote({
       title: this.state.title,
       body: this.state.body,
+      tags,
     });
 
     this.setState(() => ({
       title: '',
       body: '',
+      tagsString: '',
       errorMessage: '',
     }));
   }
 
   render() {
-    // TODO [Skilled] hitung sisa karakter jika menerapkan limit 50 karakter.
     const charLimit = 50;
     const remainingChars = charLimit - this.state.title.length;
     const isWarning = remainingChars < 10;
@@ -69,11 +76,11 @@ class NoteInput extends React.Component {
       <div className="note-input" data-testid="note-input">
         <h2>Buat catatan</h2>
 
-        {/* // TODO [Advanced] tampilkan pesan error menggunakan elemen dengan class note-input__feedback--error. */}
         {this.state.errorMessage && (
           <p
             className="note-input__feedback note-input__feedback--error"
             data-testid="note-input-feedback-error"
+            aria-live="polite"
           >
             {this.state.errorMessage}
           </p>
@@ -83,10 +90,10 @@ class NoteInput extends React.Component {
           onSubmit={this.onSubmitEventHandler}
           data-testid="note-input-form"
         >
-          {/* TODO [Skilled] tampilkan sisa karakter secara dinamis ketika limit judul diterapkan */}
           <p
             className={charLimitClassName}
             data-testid="note-input-title-remaining"
+            aria-live="polite"
           >
             Sisa karakter: {remainingChars}
           </p>
@@ -94,6 +101,7 @@ class NoteInput extends React.Component {
             className="note-input__title"
             type="text"
             placeholder="Ini adalah judul ..."
+            aria-label="Judul catatan"
             value={this.state.title}
             onChange={this.onTitleChangeEventHandler}
             required
@@ -102,10 +110,20 @@ class NoteInput extends React.Component {
           <textarea
             className="note-input__body"
             placeholder="Tuliskan catatanmu di sini ..."
+            aria-label="Isi catatan"
             value={this.state.body}
             onChange={this.onBodyChangeEventHandler}
             required
             data-testid="note-input-body-field"
+          />
+          <input
+            className="note-input__tags"
+            type="text"
+            placeholder="Tags (pisahkan dengan koma, cth: Programming, Web)"
+            aria-label="Tags catatan"
+            value={this.state.tagsString}
+            onChange={this.onTagsChangeEventHandler}
+            data-testid="note-input-tags-field"
           />
           <button type="submit" data-testid="note-input-submit-button">
             Buat

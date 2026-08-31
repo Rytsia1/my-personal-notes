@@ -8,6 +8,7 @@ function NoteSearch({ searchKeyword, onSearch }) {
       <input
         type="text"
         placeholder="Cari catatan ..."
+        aria-label="Cari catatan"
         value={searchKeyword}
         onChange={(event) => onSearch(event.target.value)}
         data-testid="note-search-input"

@@ -1,93 +1,78 @@
 // dikerjakan oleh: [distania_9]
 import React from 'react';
-import { getInitialData } from '../utils';
+import useNotes from '../hooks/useNotes';
+import useTheme from '../hooks/useTheme';
+import { filterNotes, sortNotes, getActiveNotes, getArchivedNotes, getAllTags } from '../utils/noteUtils';
 import NoteInput from './NoteInput';
 import NotesList from './NotesList';
 import NoteSearch from './NoteSearch';
+import NoteFilter from './NoteFilter';
+import Toast from './Toast';
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
+const App = () => {
+  const { 
+    notes, 
+    searchKeyword, setSearchKeyword, 
+    selectedTag, setSelectedTag, 
+    sortBy, setSortBy,
+    statusFilter, setStatusFilter,
+    addNote, editNote, deleteNote, toggleArchive,
+    lastDeletedNote, undoDelete
+  } = useNotes();
+  const { theme, toggleTheme } = useTheme();
 
-    this.state = {
-      // TODO [Basic] simpan data catatan dari util getInitialData supaya daftar awal langsung tampil.
-      notes: getInitialData(),
+  const onSearchHandler = (keyword) => {
+    setSearchKeyword(keyword);
+  };
 
-      // TODO [Skilled] sediakan state untuk kata kunci pencarian.
-      searchKeyword: '',
-    };
+  const allTags = getAllTags(notes);
+  const filteredNotes = filterNotes(notes, searchKeyword, selectedTag);
+  const sortedNotes = sortNotes(filteredNotes, sortBy);
+  
+  const activeNotes = getActiveNotes(sortedNotes);
+  const archivedNotes = getArchivedNotes(sortedNotes);
 
-    this.onAddNoteHandler = this.onAddNoteHandler.bind(this);
-    this.onDeleteHandler = this.onDeleteHandler.bind(this);
-    this.onArchiveHandler = this.onArchiveHandler.bind(this);
-    this.onSearchHandler = this.onSearchHandler.bind(this);
-  }
+  const showActive = statusFilter === 'all' || statusFilter === 'active';
+  const showArchived = statusFilter === 'all' || statusFilter === 'archived';
 
-  onAddNoteHandler({ title, body }) {
-    // TODO [Basic] tambahkan catatan baru ke state.notes gunakan spread operator dan +new Date() sebagai id.
-    // TODO [Advanced] setelah menambahkan, pastikan catatan baru muncul pada daftar aktif.
-    this.setState((prevState) => ({
-      notes: [
-        ...prevState.notes,
-        {
-          id: +new Date(),
-          title,
-          body,
-          createdAt: new Date().toISOString(),
-          archived: false,
-        },
-      ],
-    }));
-  }
+  const activeEmptyMessage = searchKeyword
+    ? `No notes found for "${searchKeyword}".`
+    : 'No notes yet. Create your first note to get started.';
 
-  onDeleteHandler(id) {
-    // TODO [Basic] gunakan array.filter untuk menghapus catatan berdasarkan id.
-    const notes = this.state.notes.filter((note) => note.id !== id);
-    this.setState({ notes });
-  }
+  const archivedEmptyMessage = searchKeyword
+    ? `No archived notes found for "${searchKeyword}".`
+    : 'No archived notes.';
 
-  onArchiveHandler(id) {
-    // TODO [Advanced] gunakan array.map untuk toggle nilai archived catatan sesuai id dan pisahkan daftar aktif/arsip.
-    const notes = this.state.notes.map((note) => {
-      if (note.id === id) {
-        return { ...note, archived: !note.archived };
-      }
-      return note;
-    });
-    this.setState({ notes });
-  }
-
-  onSearchHandler(keyword) {
-    // TODO [Skilled] simpan keyword ke state dan manfaatkan untuk memfilter catatan.
-    this.setState({ searchKeyword: keyword });
-  }
-
-  render() {
-    const { notes, searchKeyword } = this.state;
-
-    // TODO [Skilled] filter catatan berdasarkan searchKeyword (case-insensitive).
-    const filteredNotes = notes.filter((note) =>
-      note.title.toLowerCase().includes(searchKeyword.toLowerCase().trim())
-    );
-    // TODO [Advanced] pisahkan catatan aktif dan arsip menggunakan array.filter, lalu urutkan berdasarkan tanggal terbaru.
-    const activeNotes = filteredNotes
-      .filter((note) => !note.archived)
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    const archivedNotes = filteredNotes
-      .filter((note) => note.archived)
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    return (
-      <div className="note-app" data-testid="note-app">
-        <div className="note-app__header" data-testid="note-app-header">
-          <h1>Notes</h1>
-          <NoteSearch
-            searchKeyword={searchKeyword}
-            onSearch={this.onSearchHandler}
-          />
-        </div>
-        <div className="note-app__body" data-testid="note-app-body">
-          <NoteInput addNote={this.onAddNoteHandler} />
+  return (
+    <div className="note-app" data-testid="note-app">
+      <div className="note-app__header" data-testid="note-app-header">
+        <h1>Notes</h1>
+        <button 
+          onClick={toggleTheme} 
+          className="theme-toggle-button"
+          title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
+          aria-label={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
+        >
+          {theme === 'light' ? '🌙' : '☀'}
+        </button>
+        <NoteSearch
+          searchKeyword={searchKeyword}
+          onSearch={onSearchHandler}
+        />
+      </div>
+      <div className="note-app__body" data-testid="note-app-body">
+        <NoteFilter 
+          tags={allTags} 
+          selectedTag={selectedTag} 
+          onSelectTag={setSelectedTag}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          statusFilter={statusFilter}
+          onStatusChange={setStatusFilter}
+        />
+        <NoteInput addNote={addNote} />
+        
+        {showActive && (
           <section
             aria-labelledby="active-notes-title"
             data-testid="active-notes-section"
@@ -95,12 +80,17 @@ class App extends React.Component {
             <h2 id="active-notes-title">Catatan Aktif</h2>
             <NotesList
               notes={activeNotes}
-              onDelete={this.onDeleteHandler}
-              onArchive={this.onArchiveHandler}
+              onEdit={editNote}
+              onDelete={deleteNote}
+              onArchive={toggleArchive}
               searchKeyword={searchKeyword}
+              emptyMessage={activeEmptyMessage}
               dataTestId="active-notes-list"
             />
           </section>
+        )}
+        
+        {showArchived && (
           <section
             aria-labelledby="archived-notes-title"
             data-testid="archived-notes-section"
@@ -108,16 +98,26 @@ class App extends React.Component {
             <h2 id="archived-notes-title">Arsip</h2>
             <NotesList
               notes={archivedNotes}
-              onDelete={this.onDeleteHandler}
-              onArchive={this.onArchiveHandler}
+              onEdit={editNote}
+              onDelete={deleteNote}
+              onArchive={toggleArchive}
               searchKeyword={searchKeyword}
+              emptyMessage={archivedEmptyMessage}
               dataTestId="archived-notes-list"
             />
           </section>
-        </div>
+        )}
       </div>
-    );
-  }
-}
+
+      {lastDeletedNote && (
+        <Toast 
+          message="Note deleted." 
+          actionLabel="Undo" 
+          onAction={undoDelete} 
+        />
+      )}
+    </div>
+  );
+};
 
 export default App;
