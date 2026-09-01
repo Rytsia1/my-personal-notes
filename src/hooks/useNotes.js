@@ -14,6 +14,14 @@ const useNotes = () => {
     saveNotes(notes);
   }, [notes]);
 
+  useEffect(() => {
+    return () => {
+      if (deleteTimeoutRef.current) {
+        clearTimeout(deleteTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const addNote = ({ title, body, tags = [] }) => {
     const newNote = createNewNoteObject({ title, body, tags });
     setNotes((prevNotes) => [...prevNotes, newNote]);
@@ -55,7 +63,7 @@ const useNotes = () => {
   const editNote = (id, updatedData) => {
     setNotes((prevNotes) =>
       prevNotes.map((note) =>
-        note.id === id ? { ...note, ...updatedData } : note
+        note.id === id ? { ...note, ...updatedData, updatedAt: new Date().toISOString() } : note
       )
     );
   };

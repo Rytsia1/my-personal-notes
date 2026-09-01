@@ -44,6 +44,7 @@ const getInitialData = () => ([
     title: 'Module Bundler',
     body: 'Dalam konteks pemrograman JavaScript, module bundler merupakan tools yang digunakan untuk menggabungkan seluruh modul JavaScript yang digunakan oleh aplikasi menjadi satu berkas.',
     createdAt: '2025-05-20T04:27:34.572Z',
+    updatedAt: null,
     archived: false,
     tags: ['Programming', 'Tooling'],
   },
@@ -65,15 +66,20 @@ export const fetchNotes = () => {
 };
 
 export const saveNotes = (notes) => {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
+  } catch (error) {
+    console.error('Error saving notes to storage:', error);
+  }
 };
 
 export const createNewNoteObject = ({ title, body, tags = [] }) => {
   return {
-    id: +new Date(),
+    id: crypto.randomUUID(),
     title,
     body,
     createdAt: new Date().toISOString(),
+    updatedAt: null,
     archived: false,
     tags,
   };
