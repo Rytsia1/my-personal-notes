@@ -65,8 +65,15 @@ class NoteInput extends React.Component {
   render() {
     const charLimit = 50;
     const remainingChars = charLimit - this.state.title.length;
-    const isWarning = remainingChars < 10;
-    const charLimitClassName = `note-input__title__char-limit${isWarning ? ' note-input__title__char-limit--warn' : ''}`;
+    const isWarning = remainingChars < 10 && remainingChars > 0;
+    const isError = remainingChars === 0;
+    
+    let charLimitClassName = 'note-input__title__char-limit';
+    if (isError) {
+      charLimitClassName += ' note-input__title__char-limit--error';
+    } else if (isWarning) {
+      charLimitClassName += ' note-input__title__char-limit--warn';
+    }
 
     return (
       <div className="note-input" data-testid="note-input">

@@ -9,10 +9,10 @@
   --placeholder-color: #A0AEC0;
   --accent-bg: #EDF2F7;
   --accent-text: #4A5568;
-  --danger-color: #E53E3E;
-  --danger-hover: #C53030;
-  --warning-color: #D69E2E;
-  --warning-hover: #B7791F;
+  --danger-color: #C53030;
+  --danger-hover: #9B2C2C;
+  --warning-color: #B7791F;
+  --warning-hover: #975A16;
   --highlight-bg: rgba(236, 201, 75, 0.3);
   
   --tag-bg: #EDF2F7;
@@ -199,6 +199,11 @@ input::placeholder, textarea::placeholder {
 .note-input__title__char-limit--warn {
   color: var(--warning-color);
   font-weight: 600;
+}
+
+.note-input__title__char-limit--error {
+  color: var(--danger-color);
+  font-weight: bold;
 }
 
 .note-input__feedback {
@@ -622,7 +627,7 @@ input::placeholder, textarea::placeholder {
 .tag-manager-form input {
   width: 100%;
   padding: 12px;
-  border: 1px dashed var(--border-color);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   background: var(--input-bg);
   color: var(--text-color);
