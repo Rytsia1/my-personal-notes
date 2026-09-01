@@ -47,13 +47,26 @@ const TagSelect = ({ availableTags, selectedTagIds, onChange, onAddTag }) => {
     onChange(selectedTagIds.filter(id => id !== tagIdToRemove));
   };
 
+  const exactMatch = availableTags.find(
+    tag => tag.name.toLowerCase() === inputValue.trim().toLowerCase()
+  );
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Mencegah form utama tersubmit
+      if (!inputValue.trim()) return;
+      
+      if (exactMatch) {
+        handleSelectTag(exactMatch);
+      } else {
+        handleCreateTag(e);
+      }
+    }
+  };
+
   const filteredTags = availableTags.filter(tag => 
     tag.name.toLowerCase().includes(inputValue.toLowerCase()) &&
     !selectedTagIds.includes(tag.id)
-  );
-
-  const exactMatch = availableTags.find(
-    tag => tag.name.toLowerCase() === inputValue.trim().toLowerCase()
   );
 
   return (
@@ -82,6 +95,7 @@ const TagSelect = ({ availableTags, selectedTagIds, onChange, onAddTag }) => {
           className="tag-select__input"
           value={inputValue}
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           onFocus={() => setIsOpen(true)}
           placeholder="Search or create tag..."
           aria-label="Tags"
