@@ -14,15 +14,15 @@ describe('My Personal Notes App', () => {
     render(<App />);
     
     // Fill the title
-    const titleInput = screen.getByPlaceholderText('Ini adalah judul ...');
+    const titleInput = screen.getByPlaceholderText('This is a title...');
     await user.type(titleInput, 'Test Note Title');
     
     // Fill the body
-    const bodyInput = screen.getByPlaceholderText('Tuliskan catatanmu di sini ...');
+    const bodyInput = screen.getByPlaceholderText('Write your note here...');
     await user.type(bodyInput, 'This is the body of the test note.');
     
     // Submit
-    const submitBtn = screen.getByRole('button', { name: /buat/i });
+    const submitBtn = screen.getByRole('button', { name: /create/i });
     await user.click(submitBtn);
     
     // Note should appear in active notes list
@@ -60,7 +60,7 @@ describe('My Personal Notes App', () => {
     const noteItem = functionalComponentTitle.closest('.note-item');
     const archiveBtn = noteItem.querySelector('.note-item__archive-button');
     
-    expect(archiveBtn).toHaveTextContent('Arsipkan');
+    expect(archiveBtn).toHaveTextContent('Archive');
     await user.click(archiveBtn);
     
     // Filter by 'active' to ensure it's gone from active list.
@@ -77,7 +77,7 @@ describe('My Personal Notes App', () => {
     // Unarchive it
     const archivedItem = archivedNoteTitle.closest('.note-item');
     const unarchiveBtn = archivedItem.querySelector('.note-item__archive-button');
-    expect(unarchiveBtn).toHaveTextContent('Pindahkan');
+    expect(unarchiveBtn).toHaveTextContent('Unarchive');
     await user.click(unarchiveBtn);
     
     // Should be gone from archived list
@@ -106,9 +106,9 @@ describe('My Personal Notes App', () => {
     await user.selectOptions(statusSelect, 'active');
     
     // Active section should exist
-    expect(screen.getByText('Catatan Aktif')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Active Notes' })).toBeInTheDocument();
     // Archived section should NOT exist
-    expect(screen.queryByText('Arsip')).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Archive' })).not.toBeInTheDocument();
   });
 
   test('notes persist after reload', async () => {
@@ -116,9 +116,9 @@ describe('My Personal Notes App', () => {
     const { unmount } = render(<App />);
     
     // Add a new note
-    await user.type(screen.getByPlaceholderText('Ini adalah judul ...'), 'Persistent Note');
-    await user.type(screen.getByPlaceholderText('Tuliskan catatanmu di sini ...'), 'Persistent Body');
-    await user.click(screen.getByRole('button', { name: /buat/i }));
+    await user.type(screen.getByPlaceholderText('This is a title...'), 'Persistent Note');
+    await user.type(screen.getByPlaceholderText('Write your note here...'), 'Persistent Body');
+    await user.click(screen.getByRole('button', { name: /create/i }));
     
     expect(screen.getByText('Persistent Note')).toBeInTheDocument();
     

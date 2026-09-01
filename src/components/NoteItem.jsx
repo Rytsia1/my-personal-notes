@@ -57,7 +57,7 @@ function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword }) {
             />
             <p className="note-item__date" data-testid="note-item-date" style={{ margin: 0 }}>
               {showFormattedDate(note.createdAt)}
-              {note.updatedAt && <><br/><i>(Diperbarui: {showFormattedDate(note.updatedAt)})</i></>}
+              {note.updatedAt && <><br/><i>(Updated: {showFormattedDate(note.updatedAt)})</i></>}
             </p>
             <textarea
               className="note-item__edit-body"
@@ -67,7 +67,7 @@ function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword }) {
             <input
               type="text"
               className="note-item__edit-tags"
-              placeholder="Tags (pisahkan dengan koma)"
+              placeholder="Tags (comma-separated)"
               value={editTagsString}
               onChange={(e) => setEditTagsString(e.target.value)}
             />
@@ -79,7 +79,7 @@ function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword }) {
             </h3>
             <p className="note-item__date" data-testid="note-item-date">
               {showFormattedDate(note.createdAt)}
-              {note.updatedAt && <><br/><i>(Diperbarui: {showFormattedDate(note.updatedAt)})</i></>}
+              {note.updatedAt && <><br/><i>(Updated: {showFormattedDate(note.updatedAt)})</i></>}
             </p>
             <p className="note-item__body" data-testid="note-item-body">
               {highlightText(note.body, searchKeyword)}
@@ -126,7 +126,7 @@ function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword }) {
               onClick={() => onArchive(note.id)}
               dataTestId="note-item-archive-button"
             >
-              {note.archived ? 'Pindahkan' : 'Arsipkan'}
+              {note.archived ? 'Unarchive' : 'Archive'}
             </NoteActionButton>
           </>
         )}

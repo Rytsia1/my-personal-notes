@@ -74,7 +74,7 @@ class NoteInput extends React.Component {
 
     return (
       <div className="note-input" data-testid="note-input">
-        <h2>Buat catatan</h2>
+        <h2>Create Note</h2>
 
         {this.state.errorMessage && (
           <p
@@ -95,12 +95,12 @@ class NoteInput extends React.Component {
             data-testid="note-input-title-remaining"
             aria-live="polite"
           >
-            Sisa karakter: {remainingChars}
+            Remaining characters: {remainingChars}
           </p>
           <input
             className="note-input__title"
             type="text"
-            placeholder="Ini adalah judul ..."
+            placeholder="This is a title..."
             aria-label="Judul catatan"
             value={this.state.title}
             onChange={this.onTitleChangeEventHandler}
@@ -109,7 +109,7 @@ class NoteInput extends React.Component {
           />
           <textarea
             className="note-input__body"
-            placeholder="Tuliskan catatanmu di sini ..."
+            placeholder="Write your note here..."
             aria-label="Isi catatan"
             value={this.state.body}
             onChange={this.onBodyChangeEventHandler}
@@ -126,7 +126,7 @@ class NoteInput extends React.Component {
             data-testid="note-input-tags-field"
           />
           <button type="submit" data-testid="note-input-submit-button">
-            Buat
+            Create
           </button>
         </form>
       </div>

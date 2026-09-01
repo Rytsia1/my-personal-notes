@@ -3,10 +3,6 @@ import { fetchNotes, saveNotes, createNewNoteObject } from '../services/noteServ
 
 const useNotes = () => {
   const [notes, setNotes] = useState(() => fetchNotes());
-  const [searchKeyword, setSearchKeyword] = useState('');
-  const [selectedTag, setSelectedTag] = useState('All');
-  const [sortBy, setSortBy] = useState('newest');
-  const [statusFilter, setStatusFilter] = useState('all');
   const [lastDeletedNote, setLastDeletedNote] = useState(null);
   const deleteTimeoutRef = useRef(null);
 
@@ -70,14 +66,6 @@ const useNotes = () => {
 
   return {
     notes,
-    searchKeyword,
-    setSearchKeyword,
-    selectedTag,
-    setSelectedTag,
-    sortBy,
-    setSortBy,
-    statusFilter,
-    setStatusFilter,
     addNote,
     editNote,
     deleteNote,

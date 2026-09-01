@@ -1,6 +1,7 @@
 // dikerjakan oleh: [distania_9]
 import React from 'react';
 import useNotes from '../hooks/useNotes';
+import useFilters from '../hooks/useFilters';
 import useTheme from '../hooks/useTheme';
 import { filterNotes, sortNotes, getActiveNotes, getArchivedNotes, getAllTags } from '../utils/noteUtils';
 import NoteInput from './NoteInput';
@@ -12,13 +13,15 @@ import Toast from './Toast';
 const App = () => {
   const { 
     notes, 
-    searchKeyword, setSearchKeyword, 
-    selectedTag, setSelectedTag, 
-    sortBy, setSortBy,
-    statusFilter, setStatusFilter,
     addNote, editNote, deleteNote, toggleArchive,
     lastDeletedNote, undoDelete
   } = useNotes();
+  const {
+    searchKeyword, setSearchKeyword, 
+    selectedTag, setSelectedTag, 
+    sortBy, setSortBy,
+    statusFilter, setStatusFilter
+  } = useFilters();
   const { theme, toggleTheme } = useTheme();
 
   const onSearchHandler = (keyword) => {
@@ -77,7 +80,7 @@ const App = () => {
             aria-labelledby="active-notes-title"
             data-testid="active-notes-section"
           >
-            <h2 id="active-notes-title">Catatan Aktif</h2>
+            <h2 id="active-notes-title">Active Notes</h2>
             <NotesList
               notes={activeNotes}
               onEdit={editNote}
@@ -95,7 +98,7 @@ const App = () => {
             aria-labelledby="archived-notes-title"
             data-testid="archived-notes-section"
           >
-            <h2 id="archived-notes-title">Arsip</h2>
+            <h2 id="archived-notes-title">Archive</h2>
             <NotesList
               notes={archivedNotes}
               onEdit={editNote}
