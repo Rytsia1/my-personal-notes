@@ -5,7 +5,7 @@ const getInitialData = () => ([
     body: 'Babel merupakan tools open-source yang digunakan untuk mengubah sintaks ECMAScript 2015+ menjadi sintaks yang didukung oleh JavaScript engine versi lama. Babel sering dipakai ketika kita menggunakan sintaks terbaru termasuk sintaks JSX.',
     createdAt: '2025-04-01T04:27:34.572Z',
     archived: false,
-    tags: ['Programming', 'Tooling'],
+    tagIds: ['tag-1', 'tag-2'],
   },
   {
     id: 2,
@@ -13,7 +13,7 @@ const getInitialData = () => ([
     body: 'Functional component merupakan React component yang dibuat menggunakan fungsi JavaScript. Agar fungsi JavaScript dapat disebut component ia harus mengembalikan React element dan dipanggil layaknya React component.',
     createdAt: '2025-04-02T04:27:34.572Z',
     archived: false,
-    tags: ['Programming', 'React'],
+    tagIds: ['tag-1', 'tag-3'],
   },
   {
     id: 3,
@@ -21,7 +21,7 @@ const getInitialData = () => ([
     body: 'Dalam konteks pemrograman JavaScript, modularization merupakan teknik dalam memecah atau menggunakan kode dalam berkas JavaScript secara terpisah berdasarkan tanggung jawabnya masing-masing.',
     createdAt: '2025-04-03T04:27:34.572Z',
     archived: false,
-    tags: ['Programming'],
+    tagIds: ['tag-1'],
   },
   {
     id: 4,
@@ -29,7 +29,7 @@ const getInitialData = () => ([
     body: 'Dalam konteks React component, lifecycle merupakan kumpulan method yang menjadi siklus hidup mulai dari component dibuat (constructor), dicetak (render), pasca-cetak (componentDidMount), dan sebagainya. ',
     createdAt: '2025-04-08T04:27:34.572Z',
     archived: false,
-    tags: ['Programming', 'React'],
+    tagIds: ['tag-1', 'tag-3'],
   },
   {
     id: 5,
@@ -37,7 +37,7 @@ const getInitialData = () => ([
     body: 'ESM (ECMAScript Module) merupakan format modularisasi standar JavaScript.',
     createdAt: '2025-05-14T04:27:34.572Z',
     archived: false,
-    tags: ['Programming'],
+    tagIds: ['tag-1'],
   },
   {
     id: 6,
@@ -46,7 +46,7 @@ const getInitialData = () => ([
     createdAt: '2025-05-20T04:27:34.572Z',
     updatedAt: null,
     archived: false,
-    tags: ['Programming', 'Tooling'],
+    tagIds: ['tag-1', 'tag-2'],
   },
 ]);
 
@@ -54,15 +54,52 @@ const LOCAL_STORAGE_KEY = 'NOTES_APP_DATA';
 
 export const fetchNotes = () => {
   const storedNotes = localStorage.getItem(LOCAL_STORAGE_KEY);
+  let notes = null;
   if (storedNotes) {
     try {
-      return JSON.parse(storedNotes);
+      notes = JSON.parse(storedNotes);
     } catch (error) {
       console.error('Error parsing stored notes', error);
       return getInitialData();
     }
+  } else {
+    return getInitialData();
   }
-  return getInitialData();
+
+  // Migration logic: string tags -> relational tagIds
+  let needsMigration = false;
+  let storedTags = [];
+  try {
+    storedTags = JSON.parse(localStorage.getItem('TAGS_APP_DATA') || '[]');
+  } catch (e) {}
+
+  const updatedNotes = notes.map(note => {
+    if (note.tags && Array.isArray(note.tags)) {
+      needsMigration = true;
+      const newTagIds = [];
+      note.tags.forEach(tagString => {
+        const lowerStr = tagString.toLowerCase().trim();
+        let existingTag = storedTags.find(t => t.name.toLowerCase() === lowerStr);
+        if (!existingTag) {
+          existingTag = { id: crypto.randomUUID(), name: tagString.trim() };
+          storedTags.push(existingTag);
+        }
+        if (!newTagIds.includes(existingTag.id)) {
+          newTagIds.push(existingTag.id);
+        }
+      });
+      const { tags, ...rest } = note; // remove old 'tags'
+      return { ...rest, tagIds: newTagIds };
+    }
+    return note;
+  });
+
+  if (needsMigration) {
+    localStorage.setItem('TAGS_APP_DATA', JSON.stringify(storedTags));
+    saveNotes(updatedNotes);
+  }
+
+  return updatedNotes;
 };
 
 export const saveNotes = (notes) => {
@@ -73,7 +110,7 @@ export const saveNotes = (notes) => {
   }
 };
 
-export const createNewNoteObject = ({ title, body, tags = [] }) => {
+export const createNewNoteObject = ({ title, body, tagIds = [] }) => {
   return {
     id: crypto.randomUUID(),
     title,
@@ -81,6 +118,6 @@ export const createNewNoteObject = ({ title, body, tags = [] }) => {
     createdAt: new Date().toISOString(),
     updatedAt: null,
     archived: false,
-    tags,
+    tagIds,
   };
 };

@@ -1,5 +1,6 @@
 // dikerjakan oleh: [distania_9]
 import React from 'react';
+import TagSelect from './TagSelect';
 
 class NoteInput extends React.Component {
   constructor(props) {
@@ -8,7 +9,7 @@ class NoteInput extends React.Component {
     this.state = {
       title: '',
       body: '',
-      tagsString: '',
+      tagIds: [],
       errorMessage: '',
     };
 
@@ -33,9 +34,9 @@ class NoteInput extends React.Component {
     }));
   }
 
-  onTagsChangeEventHandler(event) {
+  onTagsChangeEventHandler(newTagIds) {
     this.setState(() => ({
-      tagsString: event.target.value,
+      tagIds: newTagIds,
     }));
   }
 
@@ -47,21 +48,16 @@ class NoteInput extends React.Component {
       return;
     }
 
-    const tags = this.state.tagsString
-      .split(',')
-      .map(tag => tag.trim())
-      .filter(tag => tag.length > 0);
-
     this.props.addNote({
       title: this.state.title,
       body: this.state.body,
-      tags,
+      tagIds: this.state.tagIds,
     });
 
     this.setState(() => ({
       title: '',
       body: '',
-      tagsString: '',
+      tagIds: [],
       errorMessage: '',
     }));
   }
@@ -116,14 +112,11 @@ class NoteInput extends React.Component {
             required
             data-testid="note-input-body-field"
           />
-          <input
-            className="note-input__tags"
-            type="text"
-            placeholder="Tags (pisahkan dengan koma, cth: Programming, Web)"
-            aria-label="Tags catatan"
-            value={this.state.tagsString}
+          <TagSelect 
+            availableTags={this.props.availableTags}
+            selectedTagIds={this.state.tagIds}
             onChange={this.onTagsChangeEventHandler}
-            data-testid="note-input-tags-field"
+            onAddTag={this.props.onAddTag}
           />
           <button type="submit" data-testid="note-input-submit-button">
             Create

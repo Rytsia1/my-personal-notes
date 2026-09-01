@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { showFormattedDate } from '../utils';
 import NoteActionButton from './NoteActionButton';
+import TagSelect from './TagSelect';
 
 function highlightText(text, keyword) {
   if (!keyword || !keyword.trim()) {
@@ -17,26 +18,21 @@ function highlightText(text, keyword) {
   );
 }
 
-function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword }) {
+function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword, availableTags, onAddTag }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(note.title);
   const [editBody, setEditBody] = useState(note.body);
-  const [editTagsString, setEditTagsString] = useState((note.tags || []).join(', '));
+  const [editTagIds, setEditTagIds] = useState((note.tags || []).map(t => t.id));
 
   const handleSave = () => {
-    const tagsArray = editTagsString
-      .split(',')
-      .map(tag => tag.trim())
-      .filter(tag => tag.length > 0);
-      
-    onEdit(note.id, { title: editTitle, body: editBody, tags: tagsArray });
+    onEdit(note.id, { title: editTitle, body: editBody, tagIds: editTagIds });
     setIsEditing(false);
   };
 
   const handleCancel = () => {
     setEditTitle(note.title);
     setEditBody(note.body);
-    setEditTagsString((note.tags || []).join(', '));
+    setEditTagIds((note.tags || []).map(t => t.id));
     setIsEditing(false);
   };
 
@@ -64,12 +60,11 @@ function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword }) {
               value={editBody}
               onChange={(e) => setEditBody(e.target.value)}
             />
-            <input
-              type="text"
-              className="note-item__edit-tags"
-              placeholder="Tags (comma-separated)"
-              value={editTagsString}
-              onChange={(e) => setEditTagsString(e.target.value)}
+            <TagSelect
+              availableTags={availableTags}
+              selectedTagIds={editTagIds}
+              onChange={setEditTagIds}
+              onAddTag={onAddTag}
             />
           </div>
         ) : (
@@ -87,8 +82,8 @@ function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword }) {
             {note.tags && note.tags.length > 0 && (
               <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '12px' }}>
                 {note.tags.map(tag => (
-                  <span key={tag} className="note-item__tag">
-                    #{tag}
+                  <span key={tag.id} className="note-item__tag">
+                    #{tag.name}
                   </span>
                 ))}
               </div>

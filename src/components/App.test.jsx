@@ -88,7 +88,7 @@ describe('My Personal Notes App', () => {
     const user = userEvent.setup();
     render(<App />);
     
-    const searchInput = screen.getByPlaceholderText('Cari catatan ...');
+    const searchInput = screen.getByPlaceholderText('Search notes...');
     await user.type(searchInput, 'Babel');
     
     // Babel should be there

@@ -9,19 +9,23 @@ export const showFormattedDate = (date) => {
 };
 
 export const getAllTags = (notes) => {
-  const tagsSet = new Set();
+  const tagsMap = new Map();
   notes.forEach((note) => {
     if (Array.isArray(note.tags)) {
-      note.tags.forEach((tag) => tagsSet.add(tag));
+      note.tags.forEach((tag) => {
+        if (tag && tag.id) {
+          tagsMap.set(tag.id, tag);
+        }
+      });
     }
   });
-  return Array.from(tagsSet).sort();
+  return Array.from(tagsMap.values()).sort((a, b) => a.name.localeCompare(b.name));
 };
 
-export const filterNotes = (notes, keyword, selectedTag = 'All') => {
+export const filterNotes = (notes, keyword, selectedTagId = 'All') => {
   return notes.filter((note) => {
-    // Check Tag
-    const hasTag = selectedTag === 'All' || (note.tags && note.tags.includes(selectedTag));
+    // Check Tag (by ID)
+    const hasTag = selectedTagId === 'All' || (note.tags && note.tags.some(t => t.id === selectedTagId));
     if (!hasTag) return false;
 
     // Check Keyword in title, body, or tags
@@ -30,7 +34,7 @@ export const filterNotes = (notes, keyword, selectedTag = 'All') => {
     const lowerKeyword = keyword.toLowerCase().trim();
     const matchTitle = note.title.toLowerCase().includes(lowerKeyword);
     const matchBody = note.body.toLowerCase().includes(lowerKeyword);
-    const matchTags = note.tags && note.tags.some(tag => tag.toLowerCase().includes(lowerKeyword));
+    const matchTags = note.tags && note.tags.some(tag => tag.name.toLowerCase().includes(lowerKeyword));
 
     return matchTitle || matchBody || matchTags;
   });

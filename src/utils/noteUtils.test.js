@@ -16,7 +16,7 @@ describe('noteUtils pure functions', () => {
       body: 'Hooks are a new addition in React 16.8.',
       createdAt: '2023-01-01T10:00:00.000Z',
       archived: false,
-      tags: ['React', 'Frontend']
+      tags: [{ id: 't1', name: 'React' }, { id: 't2', name: 'Frontend' }]
     },
     {
       id: 2,
@@ -24,7 +24,7 @@ describe('noteUtils pure functions', () => {
       body: 'Node.js is an open-source, cross-platform JavaScript runtime environment.',
       createdAt: '2023-01-05T10:00:00.000Z',
       archived: true,
-      tags: ['Node', 'Backend']
+      tags: [{ id: 't3', name: 'Node' }, { id: 't4', name: 'Backend' }]
     },
     {
       id: 3,
@@ -32,7 +32,7 @@ describe('noteUtils pure functions', () => {
       body: 'Simple and complete testing utilities that encourage good testing practices.',
       createdAt: '2023-01-03T10:00:00.000Z',
       archived: false,
-      tags: ['React', 'Testing']
+      tags: [{ id: 't1', name: 'React' }, { id: 't5', name: 'Testing' }]
     }
   ];
 
@@ -49,7 +49,7 @@ describe('noteUtils pure functions', () => {
   describe('getAllTags', () => {
     it('should extract and sort all unique tags from notes', () => {
       const tags = getAllTags(mockNotes);
-      expect(tags).toEqual(['Backend', 'Frontend', 'Node', 'React', 'Testing']);
+      expect(tags.map(t => t.name)).toEqual(['Backend', 'Frontend', 'Node', 'React', 'Testing']);
     });
     
     it('should return empty array if no tags exist', () => {
@@ -59,7 +59,7 @@ describe('noteUtils pure functions', () => {
 
   describe('filterNotes', () => {
     it('should filter notes by selected tag', () => {
-      const filtered = filterNotes(mockNotes, '', 'React');
+      const filtered = filterNotes(mockNotes, '', 't1');
       expect(filtered).toHaveLength(2);
       expect(filtered[0].title).toBe('React Hooks');
     });
@@ -79,12 +79,12 @@ describe('noteUtils pure functions', () => {
     it('should filter notes by keyword in tags', () => {
       const filtered = filterNotes(mockNotes, 'frontend', 'All');
       expect(filtered).toHaveLength(1);
-      expect(filtered[0].tags).toContain('Frontend');
+      expect(filtered[0].tags.find(t => t.name === 'Frontend')).toBeTruthy();
     });
 
     it('should filter by both keyword and tag', () => {
-      // "React" tag but search keyword "Testing"
-      const filtered = filterNotes(mockNotes, 'testing', 'React');
+      // "React" tag (t1) but search keyword "Testing"
+      const filtered = filterNotes(mockNotes, 'testing', 't1');
       expect(filtered).toHaveLength(1);
       expect(filtered[0].title).toBe('React Testing Library');
     });

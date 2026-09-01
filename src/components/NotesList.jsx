@@ -7,7 +7,7 @@ function groupNotesByMonthYear(notes) {
 
   notes.forEach((note) => {
     const date = new Date(note.createdAt);
-    const groupKey = date.toLocaleDateString('id-ID', {
+    const groupKey = date.toLocaleDateString('en-US', {
       month: 'long',
       year: 'numeric',
     });
@@ -24,7 +24,7 @@ function groupNotesByMonthYear(notes) {
   }));
 }
 
-function NotesList({ notes, onEdit, onDelete, onArchive, searchKeyword, emptyMessage, dataTestId = 'notes-list' }) {
+function NotesList({ notes, onEdit, onDelete, onArchive, searchKeyword, emptyMessage, availableTags, onAddTag, dataTestId = 'notes-list' }) {
   // TODO [Basic] validasi notes agar tidak kosong.
   const hasNotes = Boolean(notes && notes.length > 0);
 
@@ -37,7 +37,7 @@ function NotesList({ notes, onEdit, onDelete, onArchive, searchKeyword, emptyMes
           data-testid={`${dataTestId}-empty`}
           style={{ textAlign: 'center', color: '#666', padding: '24px 0', fontStyle: 'italic' }}
         >
-          {emptyMessage || "Tidak ada catatan"}
+          {emptyMessage || "No notes"}
         </p>
       </div>
     );
@@ -62,7 +62,7 @@ function NotesList({ notes, onEdit, onDelete, onArchive, searchKeyword, emptyMes
               className="notes-group__count"
               data-testid={`${groupName}-group-count`}
             >
-              {groupNotes.length} catatan
+              {groupNotes.length} notes
             </span>
           </div>
           <div className="notes-group__items">
@@ -74,6 +74,8 @@ function NotesList({ notes, onEdit, onDelete, onArchive, searchKeyword, emptyMes
                 onDelete={onDelete}
                 onArchive={onArchive}
                 searchKeyword={searchKeyword}
+                availableTags={availableTags}
+                onAddTag={onAddTag}
               />
             ))}
           </div>

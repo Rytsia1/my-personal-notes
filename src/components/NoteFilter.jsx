@@ -44,11 +44,11 @@ function NoteFilter({ tags, selectedTag, onSelectTag, sortBy, onSortChange, stat
           </button>
           {tags.map((tag) => (
             <button
-              key={tag}
-              onClick={() => onSelectTag(tag)}
-              className={`note-filter__tag ${selectedTag === tag ? 'note-filter__tag--selected' : ''}`}
+              key={tag.id}
+              onClick={() => onSelectTag(tag.id)}
+              className={`note-filter__tag ${selectedTag === tag.id ? 'note-filter__tag--selected' : ''}`}
             >
-              #{tag}
+              #{tag.name}
             </button>
           ))}
         </div>
