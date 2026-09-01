@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fetchTags, saveTags, createNewTagObject } from '../services/tagService';
 
 const useTags = () => {
@@ -8,7 +8,7 @@ const useTags = () => {
     saveTags(tags);
   }, [tags]);
 
-  const addTag = (name) => {
+  const addTag = useCallback((name) => {
     const cleanName = name.trim();
     if (!cleanName) return null;
 
@@ -21,9 +21,9 @@ const useTags = () => {
     const newTag = createNewTagObject(cleanName);
     setTags((prevTags) => [...prevTags, newTag]);
     return newTag;
-  };
+  }, [tags]);
 
-  const renameTag = (id, newName) => {
+  const renameTag = useCallback((id, newName) => {
     const cleanName = newName.trim();
     if (!cleanName) return;
 
@@ -42,11 +42,11 @@ const useTags = () => {
       )
     );
     return true;
-  };
+  }, [tags]);
 
-  const deleteTag = (id) => {
+  const deleteTag = useCallback((id) => {
     setTags((prevTags) => prevTags.filter((tag) => tag.id !== id));
-  };
+  }, []);
 
   return {
     tags,

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchNotes, saveNotes, createNewNoteObject } from '../services/noteService';
 
 const useNotes = () => {
@@ -18,34 +18,37 @@ const useNotes = () => {
     };
   }, []);
 
-  const addNote = ({ title, body, tags = [] }) => {
+  const addNote = useCallback(({ title, body, tags = [] }) => {
     const newNote = createNewNoteObject({ title, body, tags });
     setNotes((prevNotes) => [...prevNotes, newNote]);
-  };
+  }, []);
 
-  const deleteNote = (id) => {
-    const noteToDelete = notes.find((n) => n.id === id);
-    if (!noteToDelete) return;
+  const deleteNote = useCallback((id) => {
+    setNotes((prevNotes) => {
+      const noteToDelete = prevNotes.find((n) => n.id === id);
+      if (noteToDelete) {
+        setLastDeletedNote(noteToDelete);
+        if (deleteTimeoutRef.current) clearTimeout(deleteTimeoutRef.current);
+        
+        deleteTimeoutRef.current = setTimeout(() => {
+          setLastDeletedNote(null);
+        }, 5000);
+      }
+      return prevNotes.filter((note) => note.id !== id);
+    });
+  }, []);
 
-    setNotes((prevNotes) => prevNotes.filter((note) => note.id !== id));
-    
-    setLastDeletedNote(noteToDelete);
-    if (deleteTimeoutRef.current) clearTimeout(deleteTimeoutRef.current);
-    
-    deleteTimeoutRef.current = setTimeout(() => {
-      setLastDeletedNote(null);
-    }, 5000);
-  };
+  const undoDelete = useCallback(() => {
+    setLastDeletedNote((prevDeleted) => {
+      if (prevDeleted) {
+        setNotes((prevNotes) => [...prevNotes, prevDeleted]);
+        if (deleteTimeoutRef.current) clearTimeout(deleteTimeoutRef.current);
+      }
+      return null;
+    });
+  }, []);
 
-  const undoDelete = () => {
-    if (lastDeletedNote) {
-      setNotes((prevNotes) => [...prevNotes, lastDeletedNote]);
-      setLastDeletedNote(null);
-      if (deleteTimeoutRef.current) clearTimeout(deleteTimeoutRef.current);
-    }
-  };
-
-  const toggleArchive = (id) => {
+  const toggleArchive = useCallback((id) => {
     setNotes((prevNotes) =>
       prevNotes.map((note) => {
         if (note.id === id) {
@@ -54,17 +57,17 @@ const useNotes = () => {
         return note;
       })
     );
-  };
+  }, []);
 
-  const editNote = (id, updatedData) => {
+  const editNote = useCallback((id, updatedData) => {
     setNotes((prevNotes) =>
       prevNotes.map((note) =>
         note.id === id ? { ...note, ...updatedData, updatedAt: new Date().toISOString() } : note
       )
     );
-  };
+  }, []);
 
-  const removeTagFromNotes = (tagId) => {
+  const removeTagFromNotes = useCallback((tagId) => {
     setNotes((prevNotes) =>
       prevNotes.map((note) => {
         if (note.tagIds && note.tagIds.includes(tagId)) {
@@ -77,7 +80,7 @@ const useNotes = () => {
         return note;
       })
     );
-  };
+  }, []);
 
   return {
     notes,

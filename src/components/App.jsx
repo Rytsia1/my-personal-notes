@@ -38,10 +38,12 @@ const App = () => {
   };
 
   // Enrich notes by joining tagIds with actual tag objects
-  const enrichedNotes = notes.map(note => ({
-    ...note,
-    tags: (note.tagIds || []).map(id => tags.find(t => t.id === id)).filter(Boolean)
-  }));
+  const enrichedNotes = React.useMemo(() => {
+    return notes.map(note => ({
+      ...note,
+      tags: (note.tagIds || []).map(id => tags.find(t => t.id === id)).filter(Boolean)
+    }));
+  }, [notes, tags]);
 
   const filteredNotes = filterNotes(enrichedNotes, searchKeyword, selectedTag);
   const sortedNotes = sortNotes(filteredNotes, sortBy);
@@ -111,6 +113,8 @@ const App = () => {
               onDelete={deleteNote}
               onArchive={toggleArchive}
               searchKeyword={searchKeyword}
+              availableTags={tags}
+              onAddTag={addTag}
               emptyMessage={activeEmptyMessage}
               dataTestId="active-notes-list"
             />
@@ -129,6 +133,8 @@ const App = () => {
               onDelete={deleteNote}
               onArchive={toggleArchive}
               searchKeyword={searchKeyword}
+              availableTags={tags}
+              onAddTag={addTag}
               emptyMessage={archivedEmptyMessage}
               dataTestId="archived-notes-list"
             />

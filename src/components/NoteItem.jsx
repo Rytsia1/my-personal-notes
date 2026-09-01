@@ -130,4 +130,4 @@ function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword, availableT
   );
 }
 
-export default NoteItem;
+export default React.memo(NoteItem);

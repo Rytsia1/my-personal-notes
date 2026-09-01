@@ -85,4 +85,4 @@ function NotesList({ notes, onEdit, onDelete, onArchive, searchKeyword, emptyMes
   );
 }
 
-export default NotesList;
+export default React.memo(NotesList);
