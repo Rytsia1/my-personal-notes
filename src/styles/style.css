@@ -221,7 +221,7 @@ input::placeholder, textarea::placeholder {
   resize: vertical;
 }
 
-.note-input button {
+.note-input button[type="submit"] {
   display: block;
   width: 100%;
   padding: 14px;
@@ -237,7 +237,7 @@ input::placeholder, textarea::placeholder {
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.note-input button:hover {
+.note-input button[type="submit"]:hover {
   opacity: 0.9;
   transform: translateY(-1px);
 }
