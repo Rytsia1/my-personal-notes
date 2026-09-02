@@ -1,25 +1,24 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { fetchNotes, saveNotes, createNewNoteObject } from '../services/noteService';
+import { fetchNotes, createNoteApi, updateNoteApi, deleteNoteApi } from '../services/noteService';
 
 const useNotes = () => {
-  const [notes, setNotes] = useState(() => fetchNotes());
+  const [notes, setNotes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [lastDeletedNote, setLastDeletedNote] = useState(null);
   const deleteTimeoutRef = useRef(null);
 
   const [saveError, setSaveError] = useState(false);
 
-  const performSave = useCallback((notesToSave) => {
-    const success = saveNotes(notesToSave);
-    setSaveError(!success);
+  const loadNotes = useCallback(async () => {
+    setIsLoading(true);
+    const data = await fetchNotes();
+    setNotes(data);
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
-    performSave(notes);
-  }, [notes, performSave]);
-
-  const retrySave = useCallback(() => {
-    performSave(notes);
-  }, [notes, performSave]);
+    loadNotes();
+  }, [loadNotes]);
 
   useEffect(() => {
     return () => {
@@ -29,57 +28,74 @@ const useNotes = () => {
     };
   }, []);
 
-  const addNote = useCallback(({ title, body, tags = [] }) => {
-    const newNote = createNewNoteObject({ title, body, tags });
-    setNotes((prevNotes) => [...prevNotes, newNote]);
-  }, []);
+  const addNote = useCallback(async ({ title, body, tags = [], relationTitles = [], cognitiveLoad = 1 }) => {
+    // Optimistic UI update can be complex with relations, so we fetch after creation
+    const tagIds = tags.map(t => t.id);
+    const created = await createNoteApi({ title, body, tagIds, relationTitles, cognitiveLoad });
+    if (created) {
+      loadNotes(); // Reload to get fully hydrated entities with tags and relations
+      setSaveError(false);
+    } else {
+      setSaveError(true);
+    }
+  }, [loadNotes]);
 
-  const deleteNote = useCallback((id) => {
-    setNotes((prevNotes) => {
-      const noteToDelete = prevNotes.find((n) => n.id === id);
-      if (noteToDelete) {
-        setLastDeletedNote(noteToDelete);
-        if (deleteTimeoutRef.current) clearTimeout(deleteTimeoutRef.current);
-        
-        deleteTimeoutRef.current = setTimeout(() => {
-          setLastDeletedNote(null);
-        }, 5000);
-      }
-      return prevNotes.filter((note) => note.id !== id);
-    });
-  }, []);
+  const editNote = useCallback(async (id, updatedData) => {
+    const updated = await updateNoteApi(id, updatedData);
+    if (updated) {
+      loadNotes();
+      setSaveError(false);
+    } else {
+      setSaveError(true);
+    }
+  }, [loadNotes]);
 
-  const undoDelete = useCallback(() => {
-    setLastDeletedNote((prevDeleted) => {
-      if (prevDeleted) {
-        setNotes((prevNotes) => [...prevNotes, prevDeleted]);
-        if (deleteTimeoutRef.current) clearTimeout(deleteTimeoutRef.current);
-      }
-      return null;
-    });
-  }, []);
+  const deleteNote = useCallback(async (id) => {
+    const noteToDelete = notes.find((n) => n.id === id);
+    if (noteToDelete) {
+      setLastDeletedNote(noteToDelete);
+      if (deleteTimeoutRef.current) clearTimeout(deleteTimeoutRef.current);
+      deleteTimeoutRef.current = setTimeout(() => {
+        setLastDeletedNote(null);
+      }, 5000);
+    }
+    
+    // Optimistic delete
+    setNotes((prevNotes) => prevNotes.filter((note) => note.id !== id));
+    
+    const success = await deleteNoteApi(id);
+    if (!success) {
+      loadNotes(); // Revert if failed
+      setSaveError(true);
+    }
+  }, [notes, loadNotes]);
 
-  const toggleArchive = useCallback((id) => {
-    setNotes((prevNotes) =>
-      prevNotes.map((note) => {
-        if (note.id === id) {
-          return { ...note, archived: !note.archived };
-        }
-        return note;
-      })
-    );
-  }, []);
+  const undoDelete = useCallback(async () => {
+    if (lastDeletedNote) {
+      const { title, body, tags, cognitiveLoad } = lastDeletedNote;
+      const tagIds = tags ? tags.map(t => t.id) : [];
+      await createNoteApi({ title, body, tagIds, cognitiveLoad });
+      loadNotes();
+      setLastDeletedNote(null);
+      if (deleteTimeoutRef.current) clearTimeout(deleteTimeoutRef.current);
+    }
+  }, [lastDeletedNote, loadNotes]);
 
-  const editNote = useCallback((id, updatedData) => {
-    setNotes((prevNotes) =>
-      prevNotes.map((note) =>
-        note.id === id ? { ...note, ...updatedData, updatedAt: new Date().toISOString() } : note
-      )
-    );
+  const toggleArchive = useCallback(async (id) => {
+    const noteToUpdate = notes.find(n => n.id === id);
+    if (noteToUpdate) {
+      await updateNoteApi(id, { archived: !noteToUpdate.archived });
+      loadNotes();
+    }
+  }, [notes, loadNotes]);
+
+  const retrySave = useCallback(() => {
+    setSaveError(false);
   }, []);
 
   return {
     notes,
+    isLoading,
     addNote,
     editNote,
     deleteNote,

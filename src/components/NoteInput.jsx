@@ -122,11 +122,20 @@ class NoteInput extends React.Component {
       return;
     }
 
+    // Extract [[Relations]]
+    const relationRegex = /\[\[(.*?)\]\]/g;
+    const relationTitles = [];
+    let match;
+    while ((match = relationRegex.exec(this.state.body)) !== null) {
+      relationTitles.push(match[1].trim());
+    }
+
     this.props.addNote({
       title: this.state.title,
       body: this.state.body,
       tagIds: this.state.tagIds,
       cognitiveLoad: this.state.cognitiveLoad,
+      relationTitles: [...new Set(relationTitles)],
     });
 
     this.setState(() => ({

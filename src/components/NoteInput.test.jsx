@@ -50,7 +50,8 @@ describe('NoteInput Component', () => {
       title: 'Valid Title',
       body: 'This body has more than ten characters.',
       tagIds: [],
-      cognitiveLoad: 1
+      cognitiveLoad: 1,
+      relationTitles: [],
     });
   });
 
