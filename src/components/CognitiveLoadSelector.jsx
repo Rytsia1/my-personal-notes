@@ -5,12 +5,12 @@ function CognitiveLoadSelector({ value = 1, onChange, readOnly = false }) {
   
   const getLevelLabel = (level) => {
     switch (level) {
-      case 1: return 'Sangat Ringan';
-      case 2: return 'Ringan';
+      case 1: return 'Trivial';
+      case 2: return 'Rendah';
       case 3: return 'Menengah';
-      case 4: return 'Berat';
-      case 5: return 'Sangat Berat / Krusial';
-      default: return 'Ringan';
+      case 4: return 'Tinggi';
+      case 5: return 'Krusial';
+      default: return 'Rendah';
     }
   };
 
@@ -20,10 +20,10 @@ function CognitiveLoadSelector({ value = 1, onChange, readOnly = false }) {
   return (
     <div className={`cognitive-load ${readOnly ? 'cognitive-load--readonly' : ''}`}>
       <div className="cognitive-load__header">
-        <span className="cognitive-load__title">Beban Kognitif</span>
+        <span className="cognitive-load__title">Seberapa penting catatan ini</span>
         <span className="cognitive-load__label">{currentLabel}</span>
       </div>
-      <div className="cognitive-load__bars" role="radiogroup" aria-label="Tingkat Beban Kognitif">
+      <div className="cognitive-load__bars" role="radiogroup" aria-label="Tingkat Kepentingan">
         {levels.map((level) => {
           const isActive = level <= value;
           let colorClass = '';
