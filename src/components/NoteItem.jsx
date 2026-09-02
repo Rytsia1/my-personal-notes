@@ -1,5 +1,5 @@
 // dikerjakan oleh: [distania_9]
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { showFormattedDate } from '../utils';
 import NoteActionButton from './NoteActionButton';
 import TagSelect from './TagSelect';
@@ -25,6 +25,14 @@ function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword, availableT
   const [editBody, setEditBody] = useState(note.body);
   const [editTagIds, setEditTagIds] = useState((note.tags || []).map(t => t.id));
   const [editCognitiveLoad, setEditCognitiveLoad] = useState(note.cognitiveLoad || 1);
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    if (isEditing && textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [isEditing, editBody]);
 
   const handleSave = () => {
     onEdit(note.id, { 
@@ -107,10 +115,12 @@ function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword, availableT
               {note.updatedAt && <><br/><i>(Updated: {showFormattedDate(note.updatedAt)})</i></>}
             </p>
             <textarea
+              ref={textareaRef}
               className="note-item__edit-body"
               value={editBody}
               onChange={(e) => setEditBody(e.target.value)}
               onKeyDown={handleKeyDown}
+              style={{ overflow: 'hidden' }}
             />
             <TagSelect
               availableTags={availableTags}

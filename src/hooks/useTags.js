@@ -23,36 +23,9 @@ const useTags = () => {
     return newTag;
   }, [tags]);
 
-  const renameTag = useCallback((id, newName) => {
-    const cleanName = newName.trim();
-    if (!cleanName) return;
-
-    // Check for case-insensitive duplicate (excluding self)
-    const existingTag = tags.find(
-      (t) => t.name.toLowerCase() === cleanName.toLowerCase() && t.id !== id
-    );
-    
-    if (existingTag) {
-      return false; // Can't rename to an existing tag name
-    }
-
-    setTags((prevTags) =>
-      prevTags.map((tag) =>
-        tag.id === id ? { ...tag, name: cleanName } : tag
-      )
-    );
-    return true;
-  }, [tags]);
-
-  const deleteTag = useCallback((id) => {
-    setTags((prevTags) => prevTags.filter((tag) => tag.id !== id));
-  }, []);
-
   return {
     tags,
     addTag,
-    renameTag,
-    deleteTag,
   };
 };
 

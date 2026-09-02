@@ -21,6 +21,26 @@ class NoteInput extends React.Component {
     this.onTagsChangeEventHandler = this.onTagsChangeEventHandler.bind(this);
     this.onCognitiveLoadChange = this.onCognitiveLoadChange.bind(this);
     this.onSubmitEventHandler = this.onSubmitEventHandler.bind(this);
+
+    this.textareaRef = React.createRef();
+  }
+
+  componentDidMount() {
+    this.autoExpandTextarea();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.body !== this.state.body) {
+      this.autoExpandTextarea();
+    }
+  }
+
+  autoExpandTextarea() {
+    const textarea = this.textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
   }
 
   onTitleChangeEventHandler(event) {
@@ -119,17 +139,6 @@ class NoteInput extends React.Component {
   }
 
   render() {
-    const charLimit = 50;
-    const remainingChars = charLimit - this.state.title.length;
-    const isWarning = remainingChars < 10 && remainingChars > 0;
-    const isError = remainingChars === 0;
-    
-    let charLimitClassName = 'note-input__title__char-limit';
-    if (isError) {
-      charLimitClassName += ' note-input__title__char-limit--error';
-    } else if (isWarning) {
-      charLimitClassName += ' note-input__title__char-limit--warn';
-    }
 
     return (
       <div className="note-input" data-testid="note-input">
@@ -149,13 +158,6 @@ class NoteInput extends React.Component {
           onSubmit={this.onSubmitEventHandler}
           data-testid="note-input-form"
         >
-          <p
-            className={charLimitClassName}
-            data-testid="note-input-title-remaining"
-            aria-live="polite"
-          >
-            Remaining characters: {remainingChars}
-          </p>
           <input
             className="note-input__title"
             type="text"
@@ -167,6 +169,7 @@ class NoteInput extends React.Component {
             data-testid="note-input-title-field"
           />
           <textarea
+            ref={this.textareaRef}
             className="note-input__body"
             placeholder="Write your note here... (type #tag and press Space)"
             aria-label="Isi catatan"
@@ -175,6 +178,7 @@ class NoteInput extends React.Component {
             onKeyDown={this.onBodyKeyDownHandler}
             required
             data-testid="note-input-body-field"
+            style={{ overflow: 'hidden' }}
           />
           <TagSelect 
             availableTags={this.props.availableTags}

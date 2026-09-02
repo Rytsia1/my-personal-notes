@@ -10,14 +10,12 @@ import NotesList from './NotesList';
 import NoteSearch from './NoteSearch';
 import NoteFilter from './NoteFilter';
 import Toast from './Toast';
-import TagManagerModal from './TagManagerModal';
 
 const App = () => {
-  const [isTagManagerOpen, setIsTagManagerOpen] = React.useState(false);
   const { 
     notes, 
     addNote, editNote, deleteNote, toggleArchive,
-    lastDeletedNote, undoDelete, removeTagFromNotes,
+    lastDeletedNote, undoDelete,
     saveError, retrySave
   } = useNotes();
   const {
@@ -27,12 +25,7 @@ const App = () => {
     statusFilter, setStatusFilter
   } = useFilters();
   const { theme, toggleTheme } = useTheme();
-  const { tags, addTag, renameTag, deleteTag } = useTags();
-
-  const handleTagDelete = (tagId) => {
-    deleteTag(tagId);
-    removeTagFromNotes(tagId);
-  };
+  const { tags, addTag } = useTags();
 
   const onSearchHandler = (keyword) => {
     setSearchKeyword(keyword);
@@ -74,12 +67,6 @@ const App = () => {
           aria-label={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
         >
           {theme === 'light' ? '🌙' : '☀'}
-        </button>
-        <button 
-          className="header-action-button"
-          onClick={() => setIsTagManagerOpen(true)}
-        >
-          ⚙ Tags
         </button>
         <NoteSearch
           searchKeyword={searchKeyword}
@@ -157,17 +144,6 @@ const App = () => {
           onAction={undoDelete} 
         />
       ) : null}
-
-      {isTagManagerOpen && (
-        <TagManagerModal
-          tags={tags}
-          notes={notes}
-          onClose={() => setIsTagManagerOpen(false)}
-          onAddTag={addTag}
-          onRenameTag={renameTag}
-          onDeleteTag={handleTagDelete}
-        />
-      )}
     </div>
   );
 };

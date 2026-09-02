@@ -78,21 +78,6 @@ const useNotes = () => {
     );
   }, []);
 
-  const removeTagFromNotes = useCallback((tagId) => {
-    setNotes((prevNotes) =>
-      prevNotes.map((note) => {
-        if (note.tagIds && note.tagIds.includes(tagId)) {
-          return {
-            ...note,
-            tagIds: note.tagIds.filter(id => id !== tagId),
-            updatedAt: new Date().toISOString()
-          };
-        }
-        return note;
-      })
-    );
-  }, []);
-
   return {
     notes,
     addNote,
@@ -101,7 +86,6 @@ const useNotes = () => {
     toggleArchive,
     lastDeletedNote,
     undoDelete,
-    removeTagFromNotes,
     saveError,
     retrySave,
   };

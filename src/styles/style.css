@@ -218,7 +218,7 @@ input::placeholder, textarea::placeholder {
 
 .note-input__body {
   min-height: 150px;
-  resize: vertical;
+  resize: none;
 }
 
 .note-input button[type="submit"] {
@@ -473,7 +473,7 @@ input::placeholder, textarea::placeholder {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   min-height: 120px;
-  resize: vertical;
+  resize: none;
   background-color: var(--input-bg);
   color: var(--text-color);
   margin-bottom: 8px;
@@ -581,150 +581,7 @@ input::placeholder, textarea::placeholder {
   color: var(--accent-color);
 }
 
-/* Tag Manager Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-  backdrop-filter: blur(2px);
-}
-.modal-content {
-  background: var(--card-bg);
-  border-radius: var(--radius-lg);
-  width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: var(--shadow-lg);
-}
-.modal-header {
-  padding: 20px;
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.modal-header h2 {
-  margin: 0;
-  font-family: 'Playfair Display', serif;
-}
-.modal-close-button {
-  background: transparent;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: var(--text-color);
-}
-.tag-manager-form {
-  padding: 20px;
-  border-bottom: 1px solid var(--border-color);
-}
-.tag-manager-form input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--input-bg);
-  color: var(--text-color);
-}
-.tag-manager-list {
-  padding: 20px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.tag-manager-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  background: var(--bg-color);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-}
-.tag-manager-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.tag-manager-name {
-  font-weight: bold;
-}
-.tag-manager-count {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-.tag-manager-actions-menu button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--text-muted);
-  margin-left: 12px;
-}
-.tag-manager-actions-menu button:hover {
-  text-decoration: underline;
-  color: var(--text-color);
-}
-.tag-manager-item--editing {
-  flex-direction: column;
-  gap: 12px;
-  align-items: flex-start;
-}
-.tag-manager-item--editing input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-}
-.tag-manager-actions {
-  display: flex;
-  gap: 8px;
-  width: 100%;
-  justify-content: flex-end;
-}
-.tag-manager-actions button {
-  padding: 6px 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-  cursor: pointer;
-  background: var(--card-bg);
-  color: var(--text-color);
-}
-.tag-manager-actions button.primary {
-  background: var(--accent-color);
-  color: white;
-  border: none;
-}
-.tag-manager-actions button.danger {
-  background: #e74c3c;
-  color: white;
-  border: none;
-}
-.tag-manager-item--confirming {
-  flex-direction: column;
-  gap: 12px;
-  align-items: flex-start;
-  border-color: #e74c3c;
-  background: rgba(231, 76, 60, 0.05);
-}
-.header-action-button {
-  background: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
-  padding: 6px 12px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-.header-action-button:hover {
-  background: var(--bg-color);
-}
+
 
 @media only screen and (min-width: 600px) {
   .notes-list {
