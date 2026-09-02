@@ -17,7 +17,8 @@ const App = () => {
   const { 
     notes, 
     addNote, editNote, deleteNote, toggleArchive,
-    lastDeletedNote, undoDelete, removeTagFromNotes
+    lastDeletedNote, undoDelete, removeTagFromNotes,
+    saveError, retrySave
   } = useNotes();
   const {
     searchKeyword, setSearchKeyword, 
@@ -142,13 +143,20 @@ const App = () => {
         )}
       </div>
 
-      {lastDeletedNote && (
+      {saveError ? (
+        <Toast 
+          message="Gagal menyimpan perubahan. Penyimpanan penuh atau korup." 
+          actionLabel="Coba Lagi" 
+          onAction={retrySave}
+          type="error"
+        />
+      ) : lastDeletedNote ? (
         <Toast 
           message="Note deleted." 
           actionLabel="Undo" 
           onAction={undoDelete} 
         />
-      )}
+      ) : null}
 
       {isTagManagerOpen && (
         <TagManagerModal

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { showFormattedDate } from '../utils';
 import NoteActionButton from './NoteActionButton';
 import TagSelect from './TagSelect';
+import CognitiveLoadSelector from './CognitiveLoadSelector';
 
 function highlightText(text, keyword) {
   if (!keyword || !keyword.trim()) {
@@ -23,9 +24,15 @@ function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword, availableT
   const [editTitle, setEditTitle] = useState(note.title);
   const [editBody, setEditBody] = useState(note.body);
   const [editTagIds, setEditTagIds] = useState((note.tags || []).map(t => t.id));
+  const [editCognitiveLoad, setEditCognitiveLoad] = useState(note.cognitiveLoad || 1);
 
   const handleSave = () => {
-    onEdit(note.id, { title: editTitle, body: editBody, tagIds: editTagIds });
+    onEdit(note.id, { 
+      title: editTitle, 
+      body: editBody, 
+      tagIds: editTagIds, 
+      cognitiveLoad: editCognitiveLoad 
+    });
     setIsEditing(false);
   };
 
@@ -33,7 +40,47 @@ function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword, availableT
     setEditTitle(note.title);
     setEditBody(note.body);
     setEditTagIds((note.tags || []).map(t => t.id));
+    setEditCognitiveLoad(note.cognitiveLoad || 1);
     setIsEditing(false);
+  };
+
+  const handleKeyDown = (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+      handleSave();
+      return;
+    }
+
+    if (event.key === ' ' || event.key === 'Enter') {
+      const textarea = event.target;
+      const cursorPosition = textarea.selectionStart;
+      const textBeforeCursor = editBody.slice(0, cursorPosition);
+      
+      const match = textBeforeCursor.match(/(?:^|\s)(#[a-zA-Z0-9_-]+)$/);
+      
+      if (match) {
+        event.preventDefault();
+        const hashtagWithHash = match[1];
+        const tagName = hashtagWithHash.slice(1);
+        
+        const tag = onAddTag(tagName);
+        if (tag) {
+          setEditTagIds(prevIds => 
+            prevIds.includes(tag.id) ? prevIds : [...prevIds, tag.id]
+          );
+          
+          const textAfterCursor = editBody.slice(cursorPosition);
+          const newTextBeforeCursor = textBeforeCursor.slice(0, -hashtagWithHash.length);
+          const newBody = newTextBeforeCursor + textAfterCursor;
+          
+          setEditBody(newBody);
+          
+          setTimeout(() => {
+            const newPos = newTextBeforeCursor.length;
+            textarea.setSelectionRange(newPos, newPos);
+          }, 0);
+        }
+      }
+    }
   };
 
   return (
@@ -51,6 +98,10 @@ function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword, availableT
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
             />
+            <CognitiveLoadSelector 
+              value={editCognitiveLoad}
+              onChange={setEditCognitiveLoad}
+            />
             <p className="note-item__date" data-testid="note-item-date" style={{ margin: 0 }}>
               {showFormattedDate(note.createdAt)}
               {note.updatedAt && <><br/><i>(Updated: {showFormattedDate(note.updatedAt)})</i></>}
@@ -59,6 +110,7 @@ function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword, availableT
               className="note-item__edit-body"
               value={editBody}
               onChange={(e) => setEditBody(e.target.value)}
+              onKeyDown={handleKeyDown}
             />
             <TagSelect
               availableTags={availableTags}
@@ -79,6 +131,10 @@ function NoteItem({ note, onEdit, onDelete, onArchive, searchKeyword, availableT
             <p className="note-item__body" data-testid="note-item-body">
               {highlightText(note.body, searchKeyword)}
             </p>
+            <CognitiveLoadSelector 
+              value={note.cognitiveLoad || 1}
+              readOnly={true}
+            />
             {note.tags && note.tags.length > 0 && (
               <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '12px' }}>
                 {note.tags.map(tag => (

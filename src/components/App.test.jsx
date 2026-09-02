@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 
@@ -18,7 +18,7 @@ describe('My Personal Notes App', () => {
     await user.type(titleInput, 'Test Note Title');
     
     // Fill the body
-    const bodyInput = screen.getByPlaceholderText('Write your note here...');
+    const bodyInput = screen.getByPlaceholderText('Write your note here... (type #tag and press Space)');
     await user.type(bodyInput, 'This is the body of the test note.');
     
     // Submit
@@ -92,10 +92,13 @@ describe('My Personal Notes App', () => {
     await user.type(searchInput, 'Babel');
     
     // Babel should be there
-    const babelMatches = screen.getAllByText('Babel');
-    expect(babelMatches.length).toBeGreaterThan(0);
-    // Others shouldn't
-    expect(screen.queryByText('Functional Component')).not.toBeInTheDocument();
+    // Because NoteSearch now uses a 300ms debounce, we must wait for the filter to apply
+    await waitFor(() => {
+      const babelMatches = screen.getAllByText(/Babel/i);
+      expect(babelMatches.length).toBeGreaterThan(0);
+      // Others shouldn't
+      expect(screen.queryByText('Functional Component')).not.toBeInTheDocument();
+    });
   });
 
   test('archived notes do not appear in active list when status is active', async () => {
@@ -117,7 +120,7 @@ describe('My Personal Notes App', () => {
     
     // Add a new note
     await user.type(screen.getByPlaceholderText('This is a title...'), 'Persistent Note');
-    await user.type(screen.getByPlaceholderText('Write your note here...'), 'Persistent Body');
+    await user.type(screen.getByPlaceholderText('Write your note here... (type #tag and press Space)'), 'Will it survive a refresh?');
     await user.click(screen.getByRole('button', { name: /create/i }));
     
     expect(screen.getByText('Persistent Note')).toBeInTheDocument();

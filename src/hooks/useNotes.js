@@ -6,9 +6,20 @@ const useNotes = () => {
   const [lastDeletedNote, setLastDeletedNote] = useState(null);
   const deleteTimeoutRef = useRef(null);
 
+  const [saveError, setSaveError] = useState(false);
+
+  const performSave = useCallback((notesToSave) => {
+    const success = saveNotes(notesToSave);
+    setSaveError(!success);
+  }, []);
+
   useEffect(() => {
-    saveNotes(notes);
-  }, [notes]);
+    performSave(notes);
+  }, [notes, performSave]);
+
+  const retrySave = useCallback(() => {
+    performSave(notes);
+  }, [notes, performSave]);
 
   useEffect(() => {
     return () => {
@@ -91,6 +102,8 @@ const useNotes = () => {
     lastDeletedNote,
     undoDelete,
     removeTagFromNotes,
+    saveError,
+    retrySave,
   };
 };
 

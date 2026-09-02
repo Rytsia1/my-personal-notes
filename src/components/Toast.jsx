@@ -1,18 +1,20 @@
 import React from 'react';
 
-function Toast({ message, actionLabel, onAction }) {
+function Toast({ message, actionLabel, onAction, type = 'default' }) {
   if (!message) return null;
+
+  const isError = type === 'error';
 
   return (
     <div 
-      role="status"
-      aria-live="polite"
+      role={isError ? "alert" : "status"}
+      aria-live={isError ? "assertive" : "polite"}
       style={{
       position: 'fixed',
       bottom: '24px',
       left: '50%',
       transform: 'translateX(-50%)',
-      backgroundColor: '#333',
+      backgroundColor: isError ? '#c53030' : '#333',
       color: '#fff',
       padding: '12px 24px',
       borderRadius: '8px',

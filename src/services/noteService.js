@@ -6,6 +6,7 @@ const getInitialData = () => ([
     createdAt: '2025-04-01T04:27:34.572Z',
     archived: false,
     tagIds: ['tag-1', 'tag-2'],
+    cognitiveLoad: 4,
   },
   {
     id: 2,
@@ -14,6 +15,7 @@ const getInitialData = () => ([
     createdAt: '2025-04-02T04:27:34.572Z',
     archived: false,
     tagIds: ['tag-1', 'tag-3'],
+    cognitiveLoad: 2,
   },
   {
     id: 3,
@@ -22,6 +24,7 @@ const getInitialData = () => ([
     createdAt: '2025-04-03T04:27:34.572Z',
     archived: false,
     tagIds: ['tag-1'],
+    cognitiveLoad: 3,
   },
   {
     id: 4,
@@ -30,6 +33,7 @@ const getInitialData = () => ([
     createdAt: '2025-04-08T04:27:34.572Z',
     archived: false,
     tagIds: ['tag-1', 'tag-3'],
+    cognitiveLoad: 5,
   },
   {
     id: 5,
@@ -38,6 +42,7 @@ const getInitialData = () => ([
     createdAt: '2025-05-14T04:27:34.572Z',
     archived: false,
     tagIds: ['tag-1'],
+    cognitiveLoad: 1,
   },
   {
     id: 6,
@@ -47,6 +52,7 @@ const getInitialData = () => ([
     updatedAt: null,
     archived: false,
     tagIds: ['tag-1', 'tag-2'],
+    cognitiveLoad: 4,
   },
 ]);
 
@@ -89,9 +95,9 @@ export const fetchNotes = () => {
         }
       });
       const { tags, ...rest } = note; // remove old 'tags'
-      return { ...rest, tagIds: newTagIds };
+      return { ...rest, tagIds: newTagIds, cognitiveLoad: note.cognitiveLoad || 1 };
     }
-    return note;
+    return { ...note, cognitiveLoad: note.cognitiveLoad || 1 };
   });
 
   if (needsMigration) {
@@ -105,12 +111,14 @@ export const fetchNotes = () => {
 export const saveNotes = (notes) => {
   try {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
+    return true;
   } catch (error) {
     console.error('Error saving notes to storage:', error);
+    return false;
   }
 };
 
-export const createNewNoteObject = ({ title, body, tagIds = [] }) => {
+export const createNewNoteObject = ({ title, body, tagIds = [], cognitiveLoad = 1 }) => {
   return {
     id: crypto.randomUUID(),
     title,
@@ -119,5 +127,6 @@ export const createNewNoteObject = ({ title, body, tagIds = [] }) => {
     updatedAt: null,
     archived: false,
     tagIds,
+    cognitiveLoad,
   };
 };

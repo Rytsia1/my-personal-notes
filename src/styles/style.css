@@ -746,3 +746,85 @@ input::placeholder, textarea::placeholder {
     min-width: 350px;
   }
 }
+
+/* Cognitive Load Selector (Stamina Bar) */
+.cognitive-load {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background-color: var(--input-bg);
+  margin-bottom: 8px;
+}
+
+.cognitive-load--readonly {
+  border: none;
+  padding: 0;
+  background-color: transparent;
+  margin-bottom: 16px;
+}
+
+.cognitive-load__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.cognitive-load__title {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.cognitive-load__label {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.cognitive-load__bars {
+  display: flex;
+  gap: 4px;
+  height: 8px;
+}
+
+.cognitive-load__bar {
+  flex: 1;
+  border-radius: 4px;
+  background-color: var(--border-color);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cognitive-load--readonly .cognitive-load__bar {
+  cursor: default;
+}
+
+.cognitive-load__bar:hover:not(:disabled) {
+  opacity: 0.8;
+  transform: scaleY(1.2);
+}
+
+.cognitive-load__bar--active {
+  background-color: var(--text-muted);
+}
+
+/* Safe (1-2) */
+.cognitive-load__bar--safe {
+  background-color: #48bb78; /* Green */
+}
+[data-theme='dark'] .cognitive-load__bar--safe {
+  background-color: #68d391;
+}
+
+/* Warn (3) */
+.cognitive-load__bar--warn {
+  background-color: var(--warning-color);
+}
+
+/* Danger (4-5) */
+.cognitive-load__bar--danger {
+  background-color: var(--danger-color);
+}
